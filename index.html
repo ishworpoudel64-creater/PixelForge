@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixelForge Pro — Image Compressor, Converter &amp; Scanner</title>
+<meta name="description" content="Compress, resize, convert, scan, optimize, and export images with a professional browser-based image toolkit.">
+<meta property="og:title" content="PixelForge Pro — Image Compressor, Converter &amp; Scanner">
+<meta property="og:description" content="Compress, resize, convert, scan, optimize, and export images with a professional browser-based image toolkit.">
+<meta property="og:type" content="website">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6d5ef5">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#home"><img src="icon.svg" alt="" width="26" height="26">PixelForge Pro</a>
+  <div class="row">
+    <button class="btn" id="clearWs">Clear Workspace</button>
+    <button class="btn icon" id="themeBtn" aria-label="Toggle dark or light theme">🌓</button>
+  </div>
+</header>
+
+<section class="hero" id="home">
+  <h1>Compress, Convert &amp; Optimize Your Images</h1>
+  <p>One powerful workspace for compression, resizing, conversion, scanning, and document creation.</p>
+  <div class="row c"><button class="btn primary" id="heroStart">Start Editing</button><button class="btn" id="heroScan">Scan a Document</button></div>
+  <p class="fmts">Input: JPG · PNG · WebP · BMP · GIF · SVG &nbsp;|&nbsp; Output: JPG · PNG · WebP · BMP · PDF · ZIP</p>
+  <p class="priv">Your files stay on your device whenever processing is performed locally. PixelForge Pro never uploads them.</p>
+</section>
+
+<main id="app" class="app">
+  <nav class="tools" aria-label="Tools" id="tools">
+    <button data-tool="compress" class="on">🗜<span>Compress</span></button>
+    <button data-tool="resize">↔<span>Resize</span></button>
+    <button data-tool="convert">🔁<span>Convert</span></button>
+    <button data-tool="crop">✂<span>Crop</span></button>
+    <button data-tool="adjust">🎛<span>Adjust</span></button>
+    <button data-tool="scan">📄<span>Scan</span></button>
+    <button data-tool="pdf">📑<span>PDF</span></button>
+    <button data-tool="meta">ℹ<span>Metadata</span></button>
+    <button data-tool="history">🕘<span>History</span></button>
+  </nav>
+
+  <section class="center" aria-label="Preview">
+    <label class="drop glass" id="drop" tabindex="0" for="fileInput">
+      <strong>Drop images here</strong> or click to browse
+      <small>JPG, PNG, WebP, BMP, GIF, SVG · Multiple files supported · Very large images are limited by your device's memory</small>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+    </label>
+    <div class="glass viewer" id="viewer" hidden>
+      <div class="vbar">
+        <label class="chk"><input type="checkbox" id="cmpOn" checked> Compare</label>
+        <span class="row"><button class="btn sm" id="zout" aria-label="Zoom out">−</button>
+        <select id="zoomSel" aria-label="Zoom"><option value="fit">Fit</option><option value="0.25">25%</option><option value="0.5">50%</option><option value="1">100%</option><option value="2">200%</option><option value="4">400%</option></select>
+        <button class="btn sm" id="zin" aria-label="Zoom in">+</button><button class="btn sm" id="zfit">Fit</button></span>
+        <span class="lbl"><b>Original</b> ◀ ▶ <b>Processed</b></span>
+      </div>
+      <div class="stage" id="stage">
+        <div class="wrap" id="wrap">
+          <img id="pvAfter" alt="Processed preview">
+          <div class="ov" id="ovWrap"><img id="pvBefore" alt="Original image"></div>
+          <div class="cbox" id="cropbox" hidden><i id="cropH"></i></div>
+        </div>
+      </div>
+      <input type="range" id="cmpRange" min="0" max="100" value="50" aria-label="Before and after slider">
+      <div class="spin" id="spin" hidden></div>
+    </div>
+    <div class="files" id="files" aria-label="Files"></div>
+  </section>
+
+  <aside class="side glass" aria-label="Settings">
+    <div class="pnl" id="p-compress">
+      <h2>Compress</h2>
+      <label>Mode<select id="mode" data-k="mode"><option value="maxq">Maximum Quality</option><option value="bal" selected>Balanced</option><option value="maxc">Maximum Compression</option><option value="target">Target Size</option><option value="custom">Custom</option></select></label>
+      <label>Image Quality <output></output><input type="range" id="quality" data-k="quality" min="10" max="100" value="82" data-u="%"></label>
+      <div class="scale"><span>Low</span><span>High</span></div>
+      <div class="est" id="est" role="status" aria-live="polite">Add an image to see the estimated size.</div>
+      <h3>Target Size</h3>
+      <div class="row"><input type="number" id="tgtVal" data-k="tgtVal" min="1" value="500" aria-label="Target size value"><select id="tgtUnit" data-k="tgtUnit" aria-label="Unit"><option value="1">B</option><option value="1024" selected>KB</option><option value="1048576">MB</option><option value="1073741824">GB</option></select></div>
+      <div class="chips" id="tgtChips"><button data-tgt="20">20 KB</button><button data-tgt="50">50 KB</button><button data-tgt="100">100 KB</button><button data-tgt="200">200 KB</button><button data-tgt="500">500 KB</button><button data-tgt="1024">1 MB</button><button data-tgt="2048">2 MB</button><button data-tgt="5120">5 MB</button><button data-tgt="10240">10 MB</button></div>
+      <small>Target mode tries quality first, then gradually reduces dimensions. It reports the closest practical result and never claims an exact size unless reached.</small>
+      <h3>Smart Recommendation</h3>
+      <label>Purpose<select id="purpose" data-k="purpose"><option value="web">Website</option><option value="email">Email</option><option value="social">Social media</option><option value="print">Print / archive</option></select></label>
+      <div class="rec" id="rec">Add an image to get a recommendation.</div>
+      <div class="row"><button class="btn sm primary" id="useRec">Use Recommendation</button><button class="btn sm" id="customize">Customize Manually</button></div>
+    </div>
+
+    <div class="pnl" id="p-resize" hidden>
+      <h2>Resize</h2>
+      <div class="row"><label>Width (px)<input type="number" id="w" data-k="w" min="1" placeholder="auto"></label><label>Height (px)<input type="number" id="h" data-k="h" min="1" placeholder="auto"></label></div>
+      <label class="chk"><input type="checkbox" id="lock" data-k="lock" checked> Lock Aspect Ratio</label>
+      <label class="chk"><input type="checkbox" id="noUp" data-k="noUp" checked> Don't enlarge smaller images</label>
+      <div class="chips" id="pctChips"><button data-pct="25">25%</button><button data-pct="50">50%</button><button data-pct="75">75%</button><button data-pct="100">100%</button><button data-px="1280">1280px</button><button data-px="1920">1920px</button><button data-px="2560">2560px</button><button data-px="3840">4K</button></div>
+      <div class="est" id="dims">—</div>
+      <small>Leave a field empty for "auto". With the lock off, width and height are applied exactly.</small>
+    </div>
+
+    <div class="pnl" id="p-convert" hidden>
+      <h2>Convert</h2>
+      <div class="est" id="convFrom">Original: —</div>
+      <label>Convert To<select id="format" data-k="format"><option value="original">Original format</option><option value="image/jpeg">JPG / JPEG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option><option value="image/bmp">BMP</option><option value="application/pdf">PDF</option></select></label>
+      <label>Background color<input type="color" id="bg" data-k="bg" value="#ffffff"></label>
+      <small>JPG, BMP and PDF have no transparency, so transparent areas use the background color. PNG and WebP keep transparency. TIFF and SVG output are not supported. GIF/SVG inputs are exported as still images.</small>
+    </div>
+
+    <div class="pnl" id="p-crop" hidden>
+      <h2>Crop, Rotate &amp; Flip</h2>
+      <label>Aspect ratio<select id="ratio"><option value="0">Free crop</option><option value="1">Square 1:1</option><option value="1.3333">4:3</option><option value="1.7778">16:9</option><option value="1.5">3:2</option><option value="0.7778">Passport 35×45</option><option value="0.75">ID photo 3:4</option><option value="custom">Custom…</option></select></label>
+      <label id="ratioWrap" hidden>Custom ratio (width ÷ height)<input type="number" id="ratioCustom" step="0.01" min="0.1" max="10" value="1.25"></label>
+      <div class="row"><button class="btn primary sm" id="applyCrop">Apply Crop</button><button class="btn sm" id="resetCrop">Reset Crop</button></div>
+      <small>Drag the box to move it and the corner dot to resize.</small>
+      <div class="chips" id="rotChips"><button data-rot="90">Rotate 90°</button><button data-rot="180">Rotate 180°</button><button data-rot="270">Rotate 270°</button><button data-flip="x">Flip H</button><button data-flip="y">Flip V</button></div>
+    </div>
+
+    <div class="pnl" id="p-adjust" hidden>
+      <h2>Adjust</h2>
+      <label>Brightness <output></output><input type="range" data-k="br" min="0" max="200" value="100" data-u="%"></label>
+      <label>Contrast <output></output><input type="range" data-k="co" min="0" max="200" value="100" data-u="%"></label>
+      <label>Saturation <output></output><input type="range" data-k="sa" min="0" max="200" value="100" data-u="%"></label>
+      <label>Blur <output></output><input type="range" data-k="bl" min="0" max="20" value="0" data-u="px"></label>
+      <label>Grayscale <output></output><input type="range" data-k="gr" min="0" max="100" value="0" data-u="%"></label>
+      <label>Opacity <output></output><input type="range" data-k="op" min="0" max="100" value="100" data-u="%"></label>
+      <div class="chips" id="enh"><button data-enh="natural">Natural</button><button data-enh="bright">Bright</button><button data-enh="contrast">High Contrast</button><button data-enh="document">Document</button><button data-enh="scan">Scan</button><button data-enh="bw">Black &amp; White</button></div>
+      <button class="btn sm" id="resetAdj">Reset Adjustments</button>
+      <small id="filtNote">Sharpness is not included in this version. Document, Scan and Black &amp; White use pixel-level document filters.</small>
+    </div>
+
+    <div class="pnl" id="p-scan" hidden>
+      <h2>Document Scanner</h2>
+      <button class="btn primary full" id="scanBtn">Scan Document</button>
+      <small>Opens your camera (on phones, the camera app). You can also upload an existing photo.</small>
+      <label>Scan filter<select id="scan" data-k="scan"><option value="original">Original</option><option value="auto">Auto</option><option value="document">Document</option><option value="gray">Grayscale</option><option value="bw">Black &amp; White</option><option value="photo">Photo</option></select></label>
+      <div class="chips" id="scanFmt"><button data-fmt="image/jpeg">Export JPG</button><button data-fmt="image/png">Export PNG</button><button data-fmt="application/pdf">Export PDF</button></div>
+      <small>Use Crop to trim and Adjust to fine-tune. Automatic perspective correction and OCR (text recognition) are not implemented.</small>
+    </div>
+
+    <div class="pnl" id="p-pdf" hidden>
+      <h2>Image → PDF</h2>
+      <label>Page size<select id="page" data-k="page"><option value="a4">A4</option><option value="letter">Letter</option><option value="orig">Original size</option></select></label>
+      <label>Orientation<select id="orient" data-k="orient"><option value="port">Portrait</option><option value="land">Landscape</option></select></label>
+      <label>Margin (mm)<input type="number" id="margin" data-k="margin" min="0" max="50" value="10"></label>
+      <label class="chk"><input type="checkbox" data-k="fit" checked> Fit to page (centered)</label>
+      <button class="btn primary full" id="makePdf">Create PDF</button>
+      <small>All files, in list order, become pages. Reorder with ↑ ↓ on each file. Your image settings (quality, crop, filters) apply. PDF → image is not included because it needs a PDF rendering library (such as pdf.js) that cannot be bundled offline here.</small>
+    </div>
+
+    <div class="pnl" id="p-meta" hidden>
+      <h2>Metadata &amp; Resolution</h2>
+      <table class="meta" id="meta"><tr><td>No image selected</td></tr></table>
+      <label class="chk"><input type="checkbox" checked disabled> Remove metadata</label>
+      <small>Exporting through a canvas re-encodes the image, which drops EXIF, GPS and camera data. Reading EXIF is not included.</small>
+      <label>Print resolution (DPI)<input type="number" id="dpi" data-k="dpi" min="0" max="1200" list="dpis" placeholder="leave as is"></label>
+      <datalist id="dpis"><option value="72"><option value="96"><option value="150"><option value="200"><option value="300"><option value="600"></datalist>
+      <small><b>Pixel dimensions</b> set how much detail exists. <b>DPI</b> is only a print-size hint saved in the file (JPG, PNG, BMP); it does not add detail. Change pixels in Resize.</small>
+    </div>
+
+    <div class="pnl" id="p-history" hidden>
+      <h2>Session History</h2>
+      <ul class="hist" id="histList"><li>Nothing yet</li></ul>
+      <button class="btn sm" id="clearHist">Clear History</button>
+      <small>History lives only in this tab's memory.</small>
+    </div>
+  </aside>
+
+  <section class="bottom glass" aria-label="File information and export">
+    <div class="az" id="az" role="status" aria-live="polite">Original and optimized file details appear here.</div>
+    <div class="exp">
+      <h2>Export</h2>
+      <label>Filename<select id="nameMode" data-k="nameMode"><option value="comp">Add -compressed</option><option value="opt">Add -optimized</option><option value="orig">Original filename</option><option value="custom">Custom filename</option><option value="seq">Sequential numbering</option></select></label>
+      <label>Custom name / prefix<input type="text" id="nameCustom" data-k="nameCustom" placeholder="my-photo" maxlength="60"></label>
+      <div class="row"><button class="btn primary" id="exportBtn">Export &amp; Download</button><button class="btn" id="exportAll">Apply To All → Download</button></div>
+      <div class="bar" id="progBar" hidden><i id="prog"></i></div>
+      <div id="progTxt" role="status" aria-live="polite"></div>
+      <div class="ok" id="result"></div>
+    </div>
+  </section>
+</main>
+
+<footer><small>© 2026 PixelForge Pro · Private by design: processing happens in your browser.</small></footer>
+
+<dialog id="camDlg" aria-label="Camera"><video id="camVideo" playsinline autoplay muted></video><div class="row"><button class="btn primary" id="camShot">Capture</button><button class="btn" id="camClose">Close</button></div></dialog>
+<input type="file" id="camInput" accept="image/*" capture="environment" hidden>
+<div id="toasts" role="status" aria-live="polite"></div>
+<script src="script.js"></script>
+</body>
+</html>
